@@ -1,8 +1,9 @@
-from flask import Flask, jsonify
+﻿from flask import Flask, jsonify
 from flask_cors import CORS
 
 from .db import init_db
 from .routes.uploads import uploads_bp
+from .routes.notes import notes_bp
 from .services.upload_service import delete_expired_uploads
 
 
@@ -17,7 +18,19 @@ def create_app() -> Flask:
         ALLOWED_EXTENSIONS={"png", "jpg", "jpeg", "gif", "webp", "mp3"},
     )
 
-    CORS(app, resources={r"/*": {"origins": ["http://127.0.0.1:5173", "http://localhost:5173"]}})
+    CORS(
+        app,
+        resources={
+            r"/*": {
+                "origins": [
+                    "http://127.0.0.1:5173",
+                    "http://localhost:5173",
+                    "http://127.0.0.1:5174",
+                    "http://localhost:5174",
+                ]
+            }
+        },
+    )
 
     init_db(app)
     delete_expired_uploads(app)
@@ -27,4 +40,6 @@ def create_app() -> Flask:
         return jsonify({"status": "ok"})
 
     app.register_blueprint(uploads_bp)
+    app.register_blueprint(notes_bp)
+
     return app
