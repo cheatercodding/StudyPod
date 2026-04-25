@@ -1,34 +1,34 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000'
+const API_BASE_URL = "http://127.0.0.1:5050";
 
-export async function uploadFile(file, expire = '') {
-  const formData = new FormData()
-  formData.append('file', file)
-  if (expire) {
-    formData.append('expire', expire)
-  }
+export async function uploadFile(file) {
+  const formData = new FormData();
+  formData.append("file", file);
 
-  const response = await fetch(`${API_URL}/upload`, {
-    method: 'POST',
+  const response = await fetch(API_BASE_URL + "/upload", {
+    method: "POST",
     body: formData,
-  })
+  });
 
-  const data = await response.json()
+  const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.error || 'Yükleme sırasında hata oluştu.')
+    throw new Error(data.error || "Dosya y�klenemedi.");
   }
 
-  return data
+  return data;
 }
 
-export async function getFiles() {
-  const response = await fetch(`${API_URL}/files`)
+export async function getUploadedFiles() {
+  const response = await fetch(API_BASE_URL + "/files");
+  const data = await response.json();
+
   if (!response.ok) {
-    throw new Error('Dosyalar alınamadı.')
+    throw new Error(data.error || "Dosyalar al�namad�.");
   }
-  return response.json()
+
+  return data;
 }
 
 export function getDownloadUrl(filename) {
-  return `${API_URL}/download/${filename}`
+  return API_BASE_URL + "/download/" + filename;
 }

@@ -1,145 +1,185 @@
-import { useEffect, useMemo, useState } from 'react'
-import { getDownloadUrl, getFiles, uploadFile } from './api/uploads'
-import './index.css'
-
-function formatDate(value) {
-  if (!value) return 'Süresiz'
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return value
-  return new Intl.DateTimeFormat('tr-TR', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(date)
-}
+﻿import { useEffect, useState } from "react";
+import { assistNote, generateNote } from "./api/notes";
+import { getDownloadUrl, getUploadedFiles, uploadFile } from "./api/uploads";
+import "./index.css";
 
 function App() {
-  const [file, setFile] = useState(null)
-  const [expire, setExpire] = useState('')
-  const [status, setStatus] = useState('Bir dosya seç ve yükle.')
-  const [files, setFiles] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [filesLoading, setFilesLoading] = useState(true)
-
-  const selectedFileText = useMemo(() => {
-    if (!file) return 'Henüz dosya seçilmedi'
-    return `${file.name} • ${(file.size / 1024 / 1024).toFixed(2)} MB`
-  }, [file])
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [topic, setTopic] = useState("");
+  const [draftNote, setDraftNote] = useState("");
+  const [aiNote, setAiNote] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [fileLoading, setFileLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
   async function loadFiles() {
     try {
-      setFilesLoading(true)
-      const items = await getFiles()
-      setFiles(items)
-    } catch {
-      setStatus('Dosya listesi alınırken bir hata oluştu.')
-    } finally {
-      setFilesLoading(false)
+      const files = await getUploadedFiles();
+      setUploadedFiles(files);
+    } catch (error) {
+      setMessage(error.message);
     }
   }
 
   useEffect(() => {
-    loadFiles()
-  }, [])
+    loadFiles();
+  }, []);
 
-  async function handleUpload() {
-    if (!file) {
-      setStatus('Önce bir dosya seç.')
-      return
+  async function handleUpload(event) {
+    event.preventDefault();
+
+    if (!selectedFile) {
+      setMessage("Önce bir dosya seçmelisin.");
+      return;
     }
 
     try {
-      setLoading(true)
-      setStatus('Yükleniyor...')
-      await uploadFile(file, expire)
-      setStatus('Yükleme başarılı 🎉')
-      setFile(null)
-      setExpire('')
-      await loadFiles()
+      setFileLoading(true);
+      setMessage("");
+      await uploadFile(selectedFile);
+      setSelectedFile(null);
+      await loadFiles();
+      setMessage("Dosya başarıyla yüklendi.");
     } catch (error) {
-      setStatus(error.message || 'Bir hata oldu ❌')
+      setMessage(error.message);
     } finally {
-      setLoading(false)
+      setFileLoading(false);
+    }
+  }
+
+  async function handleGenerateNote() {
+    if (!topic.trim()) {
+      setMessage("Not oluşturmak için bir konu yaz.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setMessage("");
+      const result = await generateNote(topic);
+      setAiNote(result.note);
+    } catch (error) {
+      setMessage(error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleAssistNote() {
+    if (!draftNote.trim()) {
+      setMessage("Düzenlemek için önce not alanına bir şey yaz.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setMessage("");
+      const result = await assistNote(draftNote);
+      setAiNote(result.note);
+    } catch (error) {
+      setMessage(error.message);
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
-    <div className="page-shell">
-      <header className="hero-card">
+    <main className="app-shell">
+      <section className="hero-card">
         <div>
-          <span className="badge">StudyPod • upload modülü</span>
-          <h1>Dosya yükleme alanı</h1>
-          <p>
-            Bu sürüm, senin mevcut projeni daha temiz hale getirilmiş frontend + backend
-            yapısına çevirir. Upload bug düzeltildi, CORS eklendi ve dosya listesi bağlandı.
+          <p className="eyebrow">StudyPod AI</p>
+          <h1>Akıllı Not Asistanı</h1>
+          <p className="hero-text">
+            Konu yaz, notunu düzenlet, kaynak dosyalarını yükle. Bu sürümde AI not
+            endpointleri test modunda çalışıyor.
           </p>
         </div>
-      </header>
+      </section>
 
-      <main className="grid-layout">
-        <section className="panel">
-          <h2>Dosya yükle</h2>
-          <p className="muted">İzin verilen türler: png, jpg, jpeg, gif, webp, mp3</p>
+      {message && <div className="message-box">{message}</div>}
 
-          <label className="input-label">
-            Dosya seç
-            <input
-              type="file"
-              onChange={(event) => setFile(event.target.files?.[0] ?? null)}
-            />
-          </label>
+      <section className="grid-layout">
+        <div className="panel">
+          <h2>AI ile Not Oluştur</h2>
+          <p className="muted">Bir konu yaz, StudyPod sana sınav odaklı taslak not çıkarsın.</p>
 
-          <div className="file-preview">{selectedFileText}</div>
+          <input
+            className="text-input"
+            value={topic}
+            onChange={(event) => setTopic(event.target.value)}
+            placeholder="Örn: Parabol, Isı Alışverişi, DNA Eşlenmesi"
+          />
 
-          <label className="input-label">
-            Silinme süresi
-            <select value={expire} onChange={(event) => setExpire(event.target.value)}>
-              <option value="">Süresiz sakla</option>
-              <option value="2">2 gün sonra sil</option>
-              <option value="7">7 gün sonra sil</option>
-            </select>
-          </label>
-
-          <button className="primary-button" onClick={handleUpload} disabled={loading}>
-            {loading ? 'Yükleniyor...' : 'Dosyayı yükle'}
+          <button className="primary-button" onClick={handleGenerateNote} disabled={loading}>
+            {loading ? "Oluşturuluyor..." : "AI ile Not Oluştur"}
           </button>
 
-          <p className="status-text">{status}</p>
-        </section>
+          <hr />
 
-        <section className="panel">
-          <div className="panel-header">
-            <h2>Yüklenen dosyalar</h2>
-            <button className="ghost-button" onClick={loadFiles} disabled={filesLoading}>
-              Yenile
+          <h2>Notunu Düzenlet</h2>
+          <textarea
+            className="note-area"
+            value={draftNote}
+            onChange={(event) => setDraftNote(event.target.value)}
+            placeholder="Dağınık notunu buraya yaz. StudyPod bunu düzenli ders notuna çevirecek."
+          />
+
+          <button className="secondary-button" onClick={handleAssistNote} disabled={loading}>
+            {loading ? "Düzenleniyor..." : "AI ile Düzenle"}
+          </button>
+        </div>
+
+        <div className="panel result-panel">
+          <h2>AI Çıktısı</h2>
+          {aiNote ? (
+            <pre className="ai-output">{aiNote}</pre>
+          ) : (
+            <p className="muted">Henüz not oluşturulmadı. Sol taraftan bir konu gir.</p>
+          )}
+        </div>
+      </section>
+
+      <section className="grid-layout">
+        <div className="panel">
+          <h2>Kaynak Dosyası Yükle</h2>
+          <p className="muted">
+            Şimdilik yükleme sistemi aktif. Sonraki adımda bu dosyalardan metin çıkaracağız.
+          </p>
+
+          <form onSubmit={handleUpload} className="upload-form">
+            <input
+              type="file"
+              onChange={(event) => setSelectedFile(event.target.files?.[0] || null)}
+            />
+
+            <button className="primary-button" type="submit" disabled={fileLoading}>
+              {fileLoading ? "Yükleniyor..." : "Dosyayı Yükle"}
             </button>
-          </div>
+          </form>
+        </div>
 
-          {filesLoading ? (
-            <p className="muted">Dosyalar yükleniyor...</p>
-          ) : files.length === 0 ? (
-            <p className="muted">Henüz yüklenmiş dosya yok.</p>
+        <div className="panel">
+          <h2>Yüklenen Dosyalar</h2>
+
+          {uploadedFiles.length === 0 ? (
+            <p className="muted">Henüz dosya yüklenmedi.</p>
           ) : (
             <ul className="file-list">
-              {files.map((item) => (
-                <li key={item.filename} className="file-item">
-                  <div>
-                    <strong>{item.original_name}</strong>
-                    <div className="meta-row">
-                      <span>Yüklenme: {formatDate(item.uploaded_at)}</span>
-                      <span>Silinme: {formatDate(item.delete_at)}</span>
-                    </div>
-                  </div>
-                  <a className="download-link" href={getDownloadUrl(item.filename)}>
+              {uploadedFiles.map((file) => (
+                <li key={file.id || file.filename}>
+                  <span>{file.original_name || file.filename}</span>
+                  <a href={getDownloadUrl(file.filename)} target="_blank" rel="noreferrer">
                     İndir
                   </a>
                 </li>
               ))}
             </ul>
           )}
-        </section>
-      </main>
-    </div>
-  )
+        </div>
+      </section>
+    </main>
+  );
 }
 
-export default App
+export default App;
