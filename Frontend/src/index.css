@@ -1,68 +1,209 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
+  color: #e8ecff;
+  background: #081126;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+* {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(93, 132, 255, 0.18), transparent 30%),
+    linear-gradient(180deg, #071020 0%, #09152d 100%);
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+button,
+input,
+select {
+  font: inherit;
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
+#root {
+  min-height: 100vh;
+}
+
+.page-shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 32px 20px 48px;
+}
+
+.hero-card,
+.panel {
+  background: rgba(8, 15, 35, 0.88);
+  border: 1px solid rgba(143, 170, 255, 0.16);
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.24);
+}
+
+.hero-card {
+  padding: 28px;
+  margin-bottom: 22px;
+}
+
+.hero-card h1,
+.panel h2 {
+  margin: 0 0 8px;
+}
+
+.hero-card p,
+.muted,
+.status-text,
+.meta-row {
+  color: #b4bfdc;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(98, 141, 255, 0.14);
+  color: #bfd1ff;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.grid-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 22px;
+}
+
+.panel {
+  padding: 24px;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.input-label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+  color: #d9e2ff;
+}
+
+input[type='file'],
+select {
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid rgba(143, 170, 255, 0.18);
+  background: rgba(14, 24, 50, 0.9);
+  color: #e8ecff;
+  padding: 12px 14px;
+}
+
+.file-preview {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(14, 24, 50, 0.8);
+  border: 1px dashed rgba(143, 170, 255, 0.2);
+  color: #d8def5;
+}
+
+.primary-button,
+.ghost-button,
+.download-link {
+  border-radius: 14px;
+  transition: transform 0.16s ease, opacity 0.16s ease;
+}
+
+.primary-button,
+.ghost-button {
+  border: none;
+  padding: 12px 16px;
+}
+
+.primary-button {
+  margin-top: 18px;
+  width: 100%;
+  background: linear-gradient(135deg, #6890ff, #4f6ef7);
+  color: white;
+  font-weight: 600;
+}
+
+.primary-button:disabled,
+.ghost-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.ghost-button {
+  background: rgba(104, 144, 255, 0.12);
+  color: #d6e0ff;
+}
+
+.primary-button:hover:not(:disabled),
+.ghost-button:hover:not(:disabled),
+.download-link:hover {
+  transform: translateY(-1px);
+}
+
+.status-text {
+  margin: 16px 0 0;
+}
+
+.file-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(14, 24, 50, 0.8);
+  border: 1px solid rgba(143, 170, 255, 0.14);
+}
+
+.meta-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+  font-size: 13px;
+}
+
+.download-link {
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 10px 14px;
+  background: rgba(104, 144, 255, 0.12);
+  color: #d7e2ff;
+}
+
+@media (max-width: 900px) {
+  .grid-layout {
+    grid-template-columns: 1fr;
   }
 }
