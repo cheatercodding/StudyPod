@@ -3,6 +3,7 @@ from flask_cors import CORS
 
 from .db import init_db
 from .routes.uploads import uploads_bp
+from.routes.notes import notes_bp
 from .services.upload_service import delete_expired_uploads
 
 
@@ -27,4 +28,5 @@ def create_app() -> Flask:
         return jsonify({"status": "ok"})
 
     app.register_blueprint(uploads_bp)
+    app.register_blueprint(notes_bp)
     return app
