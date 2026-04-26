@@ -8,33 +8,19 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'StudyPod - AI Destekli Not Alma Uygulamasi',
-  description: 'Notlarinizi alin, gorseller yukleyin ve yapay zeka ile calisma verimliliginizi artirin',
-  keywords: ['not alma', 'yapay zeka', 'ogrenci', 'calisma', 'verimlilik'],
-  generator: 'v0.app',
+  title: 'StudyPod | Notlarını Düzenle',
+description: 'Notlarını toparlamak, kaynaklarını saklamak ve çalışma düzenini sadeleştirmek için geliştirilen kişisel çalışma alanı.',
+keywords: ['not alma', 'öğrenci', 'çalışma', 'ders notu', 'kaynak yönetimi'],
   icons: {
-    icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: '/apple-icon.png',
+    icon:'/StudyPodicon.png',
+    apple:'/StudyPodicon.png',
   },
 }
 
 export const viewport: Viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#F8FAFC' },
-    { media: '(prefers-color-scheme: dark)', color: '#070A13' },
+    { media: '(prefers-color-scheme: dark)', color: '#0B1220' },
   ],
 }
 
